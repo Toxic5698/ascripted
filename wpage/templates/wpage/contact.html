@@ -1,0 +1,32 @@
+{% extends 'wpage/main.html' %}
+
+{% block content %}
+
+<header class="mb-auto">
+  <div>
+    <h3 class="float-md-start mb-0">Petr Čech, advokát</h3>
+    <nav class="nav nav-masthead justify-content-center float-md-end">
+      <a class="nav-link" aria-current="page" href="{% url 'home' %}">Domů</a>
+      <a class="nav-link" href="{% url 'info' %}">Info</a>
+      <a class="nav-link active" href="{% url 'contact' %}">Kontakt</a>
+    </nav>
+        </div>
+</header>
+
+<main class="px-3 rounded" style="background-color: rgba(255,255,255,0.2);">
+  <br>
+  <p style="margin: 0px">se sídlem</p>
+  <p class="lead">Gorkého (dříve Falkensteinerova) 97/56, 602 00  Brno</p>
+  <p class="lead">IČ 10943561</p>
+  <br>
+  <p class="lead"><a style="text-decoration: none !important;
+			color: black;" href="mailto:advokat@cechpetr.cz">advokat@cechpetr.cz</a></p>
+  <p class="lead"><a style="text-decoration: none !important;
+			color: black;" href="tel:+420731663897">+420 731 663 897</a></p>
+  <br>
+  <p>Zapsán v seznamu advokátů vedeném Českou advokátní komorou<br>pod č. ev. ČAK 19827</p>
+  <br>
+
+</main>
+
+{% endblock %}

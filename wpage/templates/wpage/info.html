@@ -1,0 +1,30 @@
+{% extends 'wpage/main.html' %}
+
+{% block content %}
+
+<header class="mb-auto">
+  <div>
+    <h3 class="float-md-start mb-0">Petr Čech, advokát</h3>
+    <nav class="nav nav-masthead justify-content-center float-md-end">
+      <a class="nav-link" aria-current="page" href="{% url 'home' %}">Domů</a>
+      <a class="nav-link active" href="{% url 'info' %}">Info</a>
+      <a class="nav-link" href="{% url 'contact' %}">Kontakt</a>
+    </nav>
+        </div>
+</header>
+<main class="px-3 rounded" style="background-color: rgba(255,255,255,0.2);">
+  <br>
+  <p class="lead" style="text-align: justify; text-justify: inter-word;">Poskytuji právní služby především v oblasti obchodního, pracovního a občanského práva. Mou prioritou je se každému případu věnovat osobně a pojmout jej v širších souvislostech za účelem dosažení co nejlepšího výsledku v zájmu klienta. Ze své dlouholeté právní praxe mám zkušenost, že postačí někdy i jen jedna konzultace s advokátem k vyřešení problému, který se zdá být zprvu neřešitelným.</p>
+
+  <p style="text-align: justify; text-justify: inter-word;">Neváhejte se tedy na mě obrátit
+    <ul style="text-align: justify; text-justify: inter-word;">
+      <li>při sepisování a právním posuzování jakýchkoli smluv (dohod) či jiných listin</li>
+      <li>v souvislosti s právními konzultacemi, právními rozbory a stanovisky</li>
+      <li>při zastupování v soudních řízeních</li>
+      <li>při jednáních s obchodními partnery (i bývalými) a dalšími fyzickými i právnickými osobami, úřady a institucemi</li>
+    </ul></p>
+  <p style="text-align: justify; text-justify: inter-word;">Každodenní snahou je poskytovat služby na profesionální úrovni a vyhýbat se nesrovnalostem. Pokud by k nim ale přeci jen došlo, může se klient spotřebitel v případě sporu s advokátem obrátit na orgán pro mimosoudní řešení spotřebitelských sporů, kterým je Česká advokátní komora se sídlem v Praze, epodatelna@cak.cz. Na www.cak.cz lze nalézt podrobnosti o postupu.</p>
+  <br>
+</main>
+
+{% endblock %}
