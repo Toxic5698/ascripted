@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'cpage',
     'ipage',
     'wpage',
+    'client',
 
     'rest_framework'
 ]
