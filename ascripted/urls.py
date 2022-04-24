@@ -15,13 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from client.api import api
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('grappelli/', include('grappelli.urls')),
     path('', include('wpage.urls')),
-    path('client/', include('client.urls')),
+    # path('client/', include('client.urls')),
     path('intern/', include('ipage.urls')),
     path('auth/', include('authentication.urls')),
+    path("api/client/", api.urls),
 
 ]
