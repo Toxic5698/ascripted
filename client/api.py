@@ -2,15 +2,16 @@ from decimal import Decimal
 from typing import List, Optional
 
 from ninja import NinjaAPI
+from ninja.security import django_auth
 
 from client.models import Profile
 from client.schema import ProfileSchema, NotFoundSchema
 
 
-api = NinjaAPI()
+api = NinjaAPI(csrf=True)
 
 
-@api.get("/", response=List[ProfileSchema])
+@api.get("/", response=List[ProfileSchema], auth=django_auth)
 def profile_list(request, name: Optional[str] = None, debt: Optional[bool] = None):
     if name:
         return Profile.objects.filter(name__icontains=name)
@@ -21,7 +22,7 @@ def profile_list(request, name: Optional[str] = None, debt: Optional[bool] = Non
     return Profile.objects.all()
 
 
-@api.get("/{profile_id}", response={200: ProfileSchema, 404: NotFoundSchema})
+@api.get("/{profile_id}", response={200: ProfileSchema, 404: NotFoundSchema}, auth=django_auth)
 def profile_detail(request, profile_id):
     try:
         profile = Profile.objects.get(pk=profile_id)
