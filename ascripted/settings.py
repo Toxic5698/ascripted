@@ -26,7 +26,9 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1', cast=Csv())
 # Application definition
 
 INSTALLED_APPS = [
-    'grappelli',
+    'jet.dashboard',
+    'jet',
+    'filebrowser',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,6 +45,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_extensions',
     'import_export',
+    'tinymce',
+    'dbbackup',
+
 ]
 
 MIDDLEWARE = [
@@ -134,12 +139,36 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
     ]
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-GRAPPELLI_ADMIN_TITLE = 'Ascripted'
-GRAPPELLI_SWITCH_USER = True
+TINYMCE_FILEBROWSER = True
+
+TINYMCE_DEFAULT_CONFIG = {
+    "theme": "silver",
+    "height": 500,
+    "menubar": True,
+    "plugins": "advlist,autolink,lists,link,image,charmap,print,preview,anchor,"
+    "searchreplace,visualblocks,code,fullscreen,insertdatetime,media,table,paste,"
+    "code,help,wordcount",
+    "toolbar": "undo redo | formatselect | link image"
+    "bold italic backcolor | alignleft aligncenter "
+    "alignright alignjustify | bullist numlist outdent indent | "
+    "removeformat | help",
+}
+
+FILEBROWSER_DIRECTORY = ''
+DIRECTORY = 'uploads/'
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# DB Backup https://django-dbbackup.readthedocs.io/en/master/index.html
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': 'backup/'}
+
+# JET ADMIN CUSTOMIZATIONS
+from .jet_admin import *

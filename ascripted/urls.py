@@ -16,14 +16,22 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from client.api import api
+from filebrowser.sites import site
 
 urlpatterns = [
+    path('jet/', include('jet.urls', 'jet')),
+    path(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
+    # path('admin/filebrowser/', site.urls),
     path('admin/', admin.site.urls),
-    path('grappelli/', include('grappelli.urls')),
+    # path('grappelli/', include('grappelli.urls')),
+
     path('', include('wpage.urls')),
     # path('client/', include('client.urls')),
     path('intern/', include('ipage.urls')),
     path('auth/', include('authentication.urls')),
+
     path("api/client/", api.urls),
 
 ]
+
+admin.site.site_header = 'Ascripted'

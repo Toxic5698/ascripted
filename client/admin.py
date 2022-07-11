@@ -4,13 +4,15 @@ from .models import Person, Profile, Address, WorkSheet, WorkTask, BankAccount, 
 
 from import_export import resources
 from import_export.fields import Field
-from import_export.admin import ImportExportModelAdmin, ImportMixin
+from import_export.admin import ImportExportModelAdmin, ImportMixin, ExportMixin
+
 
 class WorkSheetResource(resources.ModelResource):
 
     class Meta:
         model = WorkSheet
-        fields = ('__all__')
+        fields = ('profile', 'causa', 'reward', 'total_reward', 'total_other_task_expense', 'total_expense', 'note',)
+
 
 class AddressTabularInlineAdmin(TabularInline):
     model = Address
@@ -34,6 +36,7 @@ class ProfileAdmin(ModelAdmin):
     list_display = ('name', 'email', 'debt')
     fields = ('name', 'email', 'phone_number', 'id_number', 'vat_number', 'debt',)
     inlines = (AddressTabularInlineAdmin, BankAccountTabularInlineAdmin, PersonTabularInlineAdmin)
+    readonly_fields = ('debt',)
 
 
 class WorkTaskInlineAdmin(TabularInline):
@@ -43,10 +46,12 @@ class WorkTaskInlineAdmin(TabularInline):
     extra = 0
 
 
-class WorkSheetAdmin(ImportExportModelAdmin, ImportMixin):
+class WorkSheetAdmin(ImportExportModelAdmin):
     fields = ('profile', 'causa', 'reward', 'total_reward', 'total_other_task_expense', 'total_expense', 'note',)
     inlines = (WorkTaskInlineAdmin,)
-    resources = WorkSheetResource
+    resource_class = WorkSheetResource
+    list_filter = ('profile', 'note', 'causa',)
+    search_fields = ('profile', 'causa', 'note')
 
     change_list_template = 'admin/import_export/change_list_import.html'
     import_template_name = 'admin/import_export/import.html'
@@ -56,6 +61,7 @@ class PaymentsAdmin(ModelAdmin):
     model = Payments
     fields = ('profile', 'amount', 'date')
     list_display = ('profile', 'amount', 'date')
+    list_filter = ('profile', 'date',)
 
 
 site.register(Profile, ProfileAdmin)

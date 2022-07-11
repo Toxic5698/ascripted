@@ -3,18 +3,23 @@ from django.db.models import (CharField, EmailField, ForeignKey, IntegerField, D
                               FloatField, DateField, TimeField, Sum)
 
 from datetime import *
+from django.utils.translation import ugettext_lazy as _
 
 
 class Profile(models.Model):
-    name = CharField(max_length=1000, unique=True)
-    email = EmailField()
-    phone_number = CharField(max_length=255, null=True, blank=True)
-    id_number = CharField(max_length=12, null=True, blank=True)
-    vat_number = CharField(max_length=12, null=True, blank=True)
+    name = CharField(max_length=1000, unique=True, verbose_name=_('name'))
+    email = EmailField(verbose_name=_('e-mail'))
+    phone_number = CharField(max_length=255, null=True, blank=True, verbose_name=_('phone number'))
+    id_number = CharField(max_length=12, null=True, blank=True, verbose_name=_('id number'))
+    vat_number = CharField(max_length=12, null=True, blank=True, verbose_name=_('vat number'))
     #created
     #updated
 
-    debt = DecimalField(null=True, blank=True, max_digits=12, decimal_places=2)
+    debt = DecimalField(null=True, blank=True, max_digits=12, decimal_places=2, verbose_name=_('debt'))
+
+    class Meta:
+        verbose_name = _("Profile")
+        verbose_name_plural = _('Profiles')
 
     def __str__(self):
         return self.name
@@ -30,40 +35,58 @@ class Profile(models.Model):
 
 
 class Address(models.Model):
-    profile = ForeignKey(Profile, on_delete=models.CASCADE, related_name='addresses', null=True, blank=True)
-    street = CharField(max_length=255)
-    city = CharField(max_length=100)
-    post_number = IntegerField()
-    note = CharField(max_length=1000)
+    profile = ForeignKey(Profile, on_delete=models.CASCADE, related_name='addresses', null=True, blank=True,
+                         verbose_name=_('profile'))
+    street = CharField(max_length=255, verbose_name=_('street'))
+    city = CharField(max_length=100, verbose_name=_('city'))
+    post_number = IntegerField(verbose_name=_('post_number'))
+    note = CharField(max_length=1000, verbose_name=_('note'))
 
     class Meta:
-        verbose_name_plural = 'Addresses'
+        verbose_name = _("Address")
+        verbose_name_plural = _('Addresses')
 
 
 class BankAccount(models.Model):
-    profile = ForeignKey(Profile, on_delete=models.CASCADE, related_name='bankaccounts', null=True, blank=True)
-    account = IntegerField()
-    bank_id = CharField(max_length=4)
+    profile = ForeignKey(Profile, on_delete=models.CASCADE, related_name='bankaccounts', null=True, blank=True,
+                         verbose_name=_('profile'))
+    account = CharField(max_length=20, verbose_name=_('account'))
+    bank_id = CharField(max_length=4, verbose_name=_('bank_id'))
+
+    class Meta:
+        verbose_name = _("Bank Account")
+        verbose_name_plural = _('Bank Accounts')
 
 
 class Person(models.Model):
-    profile = ForeignKey(Profile, on_delete=models.SET_NULL, related_name='persons', null=True)
-    title = CharField(max_length=255)
-    first_name = CharField(max_length=255)
-    last_name = CharField(max_length=255)
-    role = CharField(max_length=255)
+    profile = ForeignKey(Profile, on_delete=models.SET_NULL, related_name='persons', null=True,
+                         verbose_name=_('profile'))
+    title = CharField(max_length=255, verbose_name=_('title'))
+    first_name = CharField(max_length=255, verbose_name=_('first name'))
+    last_name = CharField(max_length=255, verbose_name=_('last name'))
+    role = CharField(max_length=255, verbose_name=_('role'))
+
+    class Meta:
+        verbose_name = _("Person")
+        verbose_name_plural = _('Persons')
 
 
 class WorkSheet(models.Model):
-    profile = ForeignKey(Profile, related_name='worksheets', on_delete=models.SET_NULL, null=True)
-    causa = CharField(max_length=255)
+    profile = ForeignKey(Profile, related_name='worksheets', on_delete=models.SET_NULL, null=True,
+                         verbose_name=_('profile'))
+    causa = CharField(max_length=255, verbose_name=_('causa'))
 
-    reward = IntegerField()
-    total_reward = DecimalField(null=True, blank=True, max_digits=12, decimal_places=2)
-    total_other_task_expense = DecimalField(null=True, blank=True, max_digits=12, decimal_places=2)
-    total_expense = DecimalField(null=True, blank=True, max_digits=12, decimal_places=2)
+    reward = IntegerField(verbose_name=_('reward'))
+    total_reward = DecimalField(null=True, blank=True, max_digits=12, decimal_places=2, verbose_name=_('total reward'))
+    total_other_task_expense = DecimalField(null=True, blank=True, max_digits=12, decimal_places=2,
+                                            verbose_name=_('total other task expense'))
+    total_expense = DecimalField(null=True, blank=True, max_digits=12, decimal_places=2, verbose_name=_('total expense'))
 
-    note = CharField(max_length=1000, null=True, blank=True)
+    note = CharField(max_length=1000, null=True, blank=True, verbose_name=_('note'))
+
+    class Meta:
+        verbose_name = _("WorkSheet")
+        verbose_name_plural = _('WorkSheets')
 
     def __str__(self):
         return f"{self.causa} - {self.profile}"
@@ -79,38 +102,50 @@ class WorkSheet(models.Model):
 
 
 class WorkTask(models.Model):
-    worksheet = ForeignKey(WorkSheet, on_delete=models.CASCADE, related_name='work_tasks')
-    subject = CharField(max_length=1000)
-    date = DateField(default=datetime.now)
-    duration = IntegerField()
-    start_task = TimeField(null=True, blank=True)
-    end_task = TimeField(null=True, blank=True)
-    task_reward = DecimalField(null=True, blank=True, max_digits=12, decimal_places=2)
-    other_expense_amount = DecimalField(null=True, blank=True, max_digits=12, decimal_places=2)
-    other_expense_note = CharField(max_length=255, null=True, blank=True)
+    worksheet = ForeignKey(WorkSheet, on_delete=models.CASCADE, related_name='work_tasks',
+                           verbose_name=_('worksheet'))
+    subject = CharField(max_length=1000, verbose_name=_('subject'))
+    date = DateField(default=datetime.now, verbose_name=_('date'))
+    duration = IntegerField(verbose_name=_('duration'), blank=True, null=True)
+    start_task = TimeField(null=True, blank=True, verbose_name=_('begin of task'))
+    end_task = TimeField(null=True, blank=True, verbose_name=_('end of task'))
+    task_reward = DecimalField(null=True, blank=True, max_digits=12, decimal_places=2,
+                               verbose_name=_('task reward'))
+    other_expense_amount = DecimalField(null=True, blank=True, max_digits=12, decimal_places=2,
+                                        verbose_name=_('other expense amount'))
+    other_expense_note = CharField(max_length=255, null=True, blank=True, verbose_name=_('other expense note'))
+
+    class Meta:
+        verbose_name = _("WorkTask")
+        verbose_name_plural = _('WorkTasks')
 
     def __str__(self):
         return f"{self.subject}, {self.date} ({self.worksheet})"
 
     def get_task_reward(self):
         task_reward = self.duration * (self.worksheet.reward/60)
-        return round(task_reward, 2)
+        return round(task_reward, 0)
 
     def save(self, *args, **kwargs):
-        self.task_reward = self.get_task_reward()
         if self.start_task and self.end_task:
-            self.duration = self.end_task - self.start_task
+            self.duration = (datetime.combine(date.today(), self.end_task) - \
+                            datetime.combine(date.today(), self.start_task)).seconds/60
+        self.task_reward = self.get_task_reward()
         super(WorkTask, self).save(*args, **kwargs)
 
 
 class Payments(models.Model):
-    profile = ForeignKey(Profile, related_name='payments', on_delete=models.SET_NULL, null=True)
-    date = DateField()
-    amount = FloatField()
+    profile = ForeignKey(Profile, related_name='payments', on_delete=models.SET_NULL, null=True, verbose_name=_('profile'))
+    date = DateField(verbose_name=_('date'))
+    amount = DecimalField(null=False, blank=False, max_digits=12, decimal_places=2, verbose_name=_('amount'))
 
     class Meta:
-        verbose_name = 'Payment'
-        verbose_name_plural = 'Payments'
+        verbose_name = _("Payments")
+        verbose_name_plural = _('Payments')
+
+    class Meta:
+        verbose_name = _('Payment')
+        verbose_name_plural = _('Payments')
 
     def __str__(self):
         return f'{self.profile} - {self.amount} - {self.date}'
