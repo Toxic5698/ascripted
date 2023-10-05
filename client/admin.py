@@ -1,6 +1,6 @@
 from django.contrib.admin import site
 from django.contrib.admin import TabularInline, ModelAdmin
-from .models import Person, Profile, Address, WorkSheet, WorkTask, BankAccount, Payments
+from .models import Person, Client, Address, WorkSheet, WorkTask, BankAccount, Payments
 
 from import_export import resources
 from import_export.fields import Field
@@ -11,7 +11,7 @@ class WorkSheetResource(resources.ModelResource):
 
     class Meta:
         model = WorkSheet
-        fields = ('profile', 'causa', 'reward', 'total_reward', 'total_other_task_expense', 'total_expense', 'note',)
+        fields = ('client', 'causa', 'reward', 'total_reward', 'total_other_task_expense', 'total_expense', 'note',)
 
 
 class AddressTabularInlineAdmin(TabularInline):
@@ -29,14 +29,14 @@ class BankAccountTabularInlineAdmin(TabularInline):
 class PersonTabularInlineAdmin(TabularInline):
     model = Person
     extra = 0
-    fields = ('title', 'first_name', 'last_name', 'role', )
+    fields = ('title', 'first_name', 'last_name', 'email', 'phone_number', 'role',)
 
 
-class ProfileAdmin(ModelAdmin):
+class ClientAdmin(ModelAdmin):
     list_display = ('name', 'email', 'debt')
-    fields = ('name', 'email', 'phone_number', 'id_number', 'vat_number', 'debt',)
+    fields = ('name', 'email', 'phone_number', 'id_number', 'vat_number', 'debt', 'created', 'last_updated',)
     inlines = (AddressTabularInlineAdmin, BankAccountTabularInlineAdmin, PersonTabularInlineAdmin)
-    readonly_fields = ('debt',)
+    readonly_fields = ('debt', 'created', 'last_updated',)
 
 
 class WorkTaskInlineAdmin(TabularInline):
@@ -44,14 +44,13 @@ class WorkTaskInlineAdmin(TabularInline):
     fields = ('subject', 'date', 'duration', 'start_task', 'end_task', 'task_reward',
               'other_expense_note', 'other_expense_amount')
     extra = 0
-
-
+y
 class WorkSheetAdmin(ImportExportModelAdmin):
-    fields = ('profile', 'causa', 'reward', 'total_reward', 'total_other_task_expense', 'total_expense', 'note',)
+    fields = ('client', 'causa', 'reward', 'total_reward', 'total_other_task_expense', 'total_expense', 'note',)
     inlines = (WorkTaskInlineAdmin,)
     resource_class = WorkSheetResource
-    list_filter = ('profile', 'note', 'causa',)
-    search_fields = ('profile', 'causa', 'note')
+    list_filter = ('client', 'note', 'causa',)
+    search_fields = ('client', 'causa', 'note')
 
     change_list_template = 'admin/import_export/change_list_import.html'
     import_template_name = 'admin/import_export/import.html'
@@ -59,11 +58,11 @@ class WorkSheetAdmin(ImportExportModelAdmin):
 
 class PaymentsAdmin(ModelAdmin):
     model = Payments
-    fields = ('profile', 'amount', 'date')
-    list_display = ('profile', 'amount', 'date')
-    list_filter = ('profile', 'date',)
+    fields = ('client', 'amount', 'date')
+    list_display = ('client', 'amount', 'date')
+    list_filter = ('client', 'date',)
 
 
-site.register(Profile, ProfileAdmin)
+site.register(Client, ClientAdmin)
 site.register(WorkSheet, WorkSheetAdmin)
 site.register(Payments, PaymentsAdmin)

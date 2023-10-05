@@ -1,10 +1,10 @@
 from ninja import ModelSchema, Schema
-from client.models import Profile
+from client.models import Client
 
 
-class ProfileSchema(ModelSchema):
+class ClientSchema(ModelSchema):
     class Config:
-        model = Profile
+        model = Client
         model_fields = '__all__'
 
 

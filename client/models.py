@@ -1,25 +1,25 @@
 from django.db import models
 from django.db.models import (CharField, EmailField, ForeignKey, IntegerField, DecimalField,
-                              FloatField, DateField, TimeField, Sum)
+                              DateTimeField, DateField, TimeField, Sum)
 
 from datetime import *
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
-class Profile(models.Model):
+class Client(models.Model):
     name = CharField(max_length=1000, unique=True, verbose_name=_('name'))
     email = EmailField(verbose_name=_('e-mail'))
     phone_number = CharField(max_length=255, null=True, blank=True, verbose_name=_('phone number'))
-    id_number = CharField(max_length=12, null=True, blank=True, verbose_name=_('id number'))
-    vat_number = CharField(max_length=12, null=True, blank=True, verbose_name=_('vat number'))
-    #created
-    #updated
+    id_number = CharField(max_length=12, null=True, blank=True, verbose_name=_('ID number'))
+    vat_number = CharField(max_length=12, null=True, blank=True, verbose_name=_('VAT number'))
+    created = DateTimeField(auto_now_add=True, null=False, blank=False, verbose_name=_('created'))
+    last_updated = DateTimeField(auto_now=True, null=False, blank=False, verbose_name=_('last updated'))
 
     debt = DecimalField(null=True, blank=True, max_digits=12, decimal_places=2, verbose_name=_('debt'))
 
     class Meta:
-        verbose_name = _("Profile")
-        verbose_name_plural = _('Profiles')
+        verbose_name = _("Client")
+        verbose_name_plural = _('Clients')
 
     def __str__(self):
         return self.name
@@ -35,12 +35,12 @@ class Profile(models.Model):
 
 
 class Address(models.Model):
-    profile = ForeignKey(Profile, on_delete=models.CASCADE, related_name='addresses', null=True, blank=True,
-                         verbose_name=_('profile'))
+    client = ForeignKey(Client, on_delete=models.CASCADE, related_name='addresses', null=True, blank=True,
+                        verbose_name=_('client'))
     street = CharField(max_length=255, verbose_name=_('street'))
     city = CharField(max_length=100, verbose_name=_('city'))
-    post_number = IntegerField(verbose_name=_('post_number'))
-    note = CharField(max_length=1000, verbose_name=_('note'))
+    post_number = CharField(max_length=5, verbose_name=_('post_number'))
+    note = CharField(max_length=1000, verbose_name=_('note'), null=True, blank=True, )
 
     class Meta:
         verbose_name = _("Address")
@@ -48,8 +48,8 @@ class Address(models.Model):
 
 
 class BankAccount(models.Model):
-    profile = ForeignKey(Profile, on_delete=models.CASCADE, related_name='bankaccounts', null=True, blank=True,
-                         verbose_name=_('profile'))
+    client = ForeignKey(Client, on_delete=models.CASCADE, related_name='bankaccounts', null=True, blank=True,
+                        verbose_name=_('client'))
     account = CharField(max_length=20, verbose_name=_('account'))
     bank_id = CharField(max_length=4, verbose_name=_('bank_id'))
 
@@ -59,12 +59,14 @@ class BankAccount(models.Model):
 
 
 class Person(models.Model):
-    profile = ForeignKey(Profile, on_delete=models.SET_NULL, related_name='persons', null=True,
-                         verbose_name=_('profile'))
-    title = CharField(max_length=255, verbose_name=_('title'))
+    client = ForeignKey(Client, on_delete=models.SET_NULL, related_name='persons', null=True,
+                        verbose_name=_('client'))
+    title = CharField(max_length=255, verbose_name=_('title'), null=True, blank=True, )
     first_name = CharField(max_length=255, verbose_name=_('first name'))
     last_name = CharField(max_length=255, verbose_name=_('last name'))
-    role = CharField(max_length=255, verbose_name=_('role'))
+    email = CharField(max_length=255, verbose_name=_('email'), null=True, blank=True)
+    phone_number = CharField(max_length=255, null=True, blank=True, verbose_name=_('phone number'))
+    role = CharField(max_length=255, verbose_name=_('role'), null=True, blank=True, )
 
     class Meta:
         verbose_name = _("Person")
@@ -72,15 +74,16 @@ class Person(models.Model):
 
 
 class WorkSheet(models.Model):
-    profile = ForeignKey(Profile, related_name='worksheets', on_delete=models.SET_NULL, null=True,
-                         verbose_name=_('profile'))
+    client = ForeignKey(Client, related_name='worksheets', on_delete=models.SET_NULL, null=True,
+                        verbose_name=_('client'))
     causa = CharField(max_length=255, verbose_name=_('causa'))
 
     reward = IntegerField(verbose_name=_('reward'))
     total_reward = DecimalField(null=True, blank=True, max_digits=12, decimal_places=2, verbose_name=_('total reward'))
     total_other_task_expense = DecimalField(null=True, blank=True, max_digits=12, decimal_places=2,
                                             verbose_name=_('total other task expense'))
-    total_expense = DecimalField(null=True, blank=True, max_digits=12, decimal_places=2, verbose_name=_('total expense'))
+    total_expense = DecimalField(null=True, blank=True, max_digits=12, decimal_places=2,
+                                 verbose_name=_('total expense'))
 
     note = CharField(max_length=1000, null=True, blank=True, verbose_name=_('note'))
 
@@ -89,16 +92,30 @@ class WorkSheet(models.Model):
         verbose_name_plural = _('WorkSheets')
 
     def __str__(self):
-        return f"{self.causa} - {self.profile}"
+        return f"{self.causa} - {self.client}"
 
-    def clean(self):
-        self.total_reward = round(self.work_tasks.all().aggregate(Sum('task_reward'))['task_reward__sum'], 2)
-        self.total_other_task_expense = round(self.work_tasks.all()
-                                              .aggregate(Sum('other_expense_amount'))['other_expense_amount__sum'], 2)
-        self.total_expense = self.total_reward + self.total_other_task_expense
+    # def clean(self):
+    # self.total_reward = round(self.work_tasks.all().aggregate(Sum('task_reward'))['task_reward__sum'], 2)
+    # self.total_other_task_expense = round(self.work_tasks.all()
+    #                                       .aggregate(Sum('other_expense_amount'))['other_expense_amount__sum'], 2)
+    # self.total_expense = self.total_reward + self.total_other_task_expense
 
     def save(self, *args, **kwargs):
         super(WorkSheet, self).save(*args, **kwargs)
+
+    def calculate_reward(self):
+        try:
+            self.total_reward = round(self.work_tasks.all().aggregate(Sum('task_reward'))['task_reward__sum'], 2)
+        except TypeError:
+            self.total_reward = 0
+        try:
+            self.total_other_task_expense = round(self.work_tasks.all()
+                                                  .aggregate(Sum('other_expense_amount'))['other_expense_amount__sum'],
+                                                  2)
+        except TypeError:
+            self.total_other_task_expense = 0
+        self.total_expense = self.total_reward + self.total_other_task_expense
+        self.save()
 
 
 class WorkTask(models.Model):
@@ -123,19 +140,20 @@ class WorkTask(models.Model):
         return f"{self.subject}, {self.date} ({self.worksheet})"
 
     def get_task_reward(self):
-        task_reward = self.duration * (self.worksheet.reward/60)
+        task_reward = self.duration * (self.worksheet.reward / 60)
         return round(task_reward, 0)
 
     def save(self, *args, **kwargs):
         if self.start_task and self.end_task:
-            self.duration = (datetime.combine(date.today(), self.end_task) - \
-                            datetime.combine(date.today(), self.start_task)).seconds/60
+            self.duration = (datetime.combine(date.today(), self.end_task) -
+                             datetime.combine(date.today(), self.start_task)).seconds / 60
         self.task_reward = self.get_task_reward()
         super(WorkTask, self).save(*args, **kwargs)
+        self.worksheet.calculate_reward()
 
 
 class Payments(models.Model):
-    profile = ForeignKey(Profile, related_name='payments', on_delete=models.SET_NULL, null=True, verbose_name=_('profile'))
+    client = ForeignKey(Client, related_name='payments', on_delete=models.SET_NULL, null=True, verbose_name=_('client'))
     date = DateField(verbose_name=_('date'))
     amount = DecimalField(null=False, blank=False, max_digits=12, decimal_places=2, verbose_name=_('amount'))
 
@@ -143,15 +161,9 @@ class Payments(models.Model):
         verbose_name = _("Payments")
         verbose_name_plural = _('Payments')
 
-    class Meta:
-        verbose_name = _('Payment')
-        verbose_name_plural = _('Payments')
-
     def __str__(self):
-        return f'{self.profile} - {self.amount} - {self.date}'
+        return f'{self.client} - {self.amount} - {self.date}'
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        self.profile.save()
-
-
+        self.client.save()
